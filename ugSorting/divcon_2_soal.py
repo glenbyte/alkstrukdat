@@ -38,7 +38,7 @@ def merge(kiri, kanan):
     i = 0
     j = 0
     while i < len(kiri) and j < len(kanan):
-        if kiri[i]["rata_rata"] < kanan[j]["rata_rata"]:
+        if kiri[i]["rata_rata"] >= kanan[j]["rata_rata"]:
             result.append(kiri[i])
             i += 1
         else:
