@@ -12,7 +12,7 @@ if 'password' not in st.session_state:
     st.session_state['password'] = None
 
 if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False 
+    st.session_state['logged_in'] = False
 # kalau misal ada error itu gara gara versi streamlit minimal 1.52.0 ya
 # silahkan up pakai pip install --upgrade streamlit
 # page header
@@ -27,21 +27,25 @@ st.write(user_by_name)
 # hint -> https://docs.streamlit.io/develop/api-reference/widgets/st.text_input
 username = st.text_input("username")
 password = st.text_input("password", type="password")
+
 # submit -> st.button(label="Login", type="primary")
 if st.button("login", type="primary"):
     if username in user_by_name and password == user_by_name[username]["password"]:
         st.session_state["logged_in"] = True
         st.session_state["username"] = username
+        st.session_state["password"] = password
        
         role = user_by_name[username]["role"]   
-        if role == "peserta":
+        
+        if role == "Peserta":
             st.switch_page("pages/event.py")
-        elif role == "admin":
+        elif role == "Admin":
             st.switch_page("pages/dashboard.py")
         else:
             st.error("login gagal! silahkan coba kembali")
 #  Kondisi -> jika role yang login peserta alihin nya ke event langsung dan ga boleh buka dashboard
-
+    else:
+        st.error("login gagal! silahkan coba kembali")
 # Kalau salah st.error "Login gagal! Silahkan coba kembali"
 
 

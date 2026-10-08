@@ -13,10 +13,11 @@ username = st.session_state.username
 # role = ??
 role = data[username]["role"]
 # JIKA YANG LOGIN PESERTA -> ALIHKAN KE PAGE EVENT
-if role == "peserta":
+if role == "Peserta":
     st.switch_page("pages/event.py")
+    
 st.title(f"Welcome, {role} 👋")
 # JIKA YANG LOGIN ADMIN TAMPILKAN SELURUH DATA TERSERAH MAU BENTUKNYA APAPUN st.table, st.write boleh aja
-if role == "admin":
-    st.subheader("data pengguna")
+if role == "Admin":
+    st.subheader("Data Pengguna")
     st.table(data)

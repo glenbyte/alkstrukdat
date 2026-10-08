@@ -11,25 +11,38 @@ user_data = user[username]
 # hint untuk mematikan text input ada di -> https://docs.streamlit.io/develop/api-reference/widgets/st.text_input
 # BUAT 2 INPUT TEXT 1 Username 1 Password namun disable/matikan field Username dan yang password harus tipe password
 st.title("profile")
-username = st.text_input("username", value=username, disabled=True)
-password = st.text_input("password", value=user_data["password"], type="password")
+username = st.text_input(
+    "username",
+    value=username,
+    disabled=True
+)
+
+password = st.text_input(
+    "password",
+    value=user_data["password"],
+    type="password"
+)
+
 # Silahkan kalau mau baca baca ini hehe ga wajib ya-> https://discuss.streamlit.io/t/buttons-alignment/51929
 col1, space, col2 = st.columns([1,3,1])
 with col1:
     # Buat tombol logout st.button("logout", type="primary") keluar ke app.py
-    if st.button("Logout", type="primary"):
-        st.session_state.login = False
-        st.rerun()
-
+    if st.button("Logout", type="primary", use_container_width=True):
+        st.session_state["logged_in"] = False
+        st.session_state["username"] = None
+        st.session_state["password"] = None
+        st.switch_page("app.py")
 with col2:
     
     # Ini untuk ubah password st.button("Ganti Data", type="secondary", width=400)
     # Kondisi -> Password baru dan lama ga boleh sama 
     # Jika sama -> st.error("ga boleh sama wok")
     # jika beda ubah melalui variabel 'user' lalu tampilkan st.success("Berhasil")
-    if st.button("ganti data", type="secondary", width=400):
-        if password == user[st.session_state.username]["password"]:
+    if st.button("ganti data", type="secondary", use_container_width=True):
+        old_password = user[st.session_state.username]["password"]
+        if password == old_password:
             st.error("ga boleh sama wok")
         else:
             user[st.session_state.username]["password"] = password
+            st.session_state["password"] = password
             st.success("Berhasil")
