@@ -19,68 +19,69 @@ def buat_katalog():
 # ===== Logika =====
 def pinjam_buku(katalog, pinjaman, nama, kode):
     # return pesan error (str) kalau gagal, atau None kalau berhasil
-    if kode in katalog:
-        return f" {nama} Berhasil meminjam buku"
+    if nama == "":
+        return "Nama peminjam wajib diisi!"
 
-    for k in pinjam:
-        return f"buku ini sudah kamu pinjam"  
-    if kode in pinjaman :
-        return f"stok buku habis"
-    
-    pinjaman.append({"nama" : nama, "kode": kode})
+    for data in pinjaman:
+        if data["nama"] == nama and data["kode"] == kode:
+            return "Buku ini sudah kamu pinjam!"
+
+    if katalog[kode]["stok"] == 0:
+        return "Stok buku habis!"
+        
     katalog[kode]["stok"] -= 1
-    return None
+    pinjaman.append({"nama": nama,"kode": kode})
     
-   
+    return None  # Ditambahkan agar eksplisit mengembalikan None saat berhasil
+
+
 def kembalikan_buku(katalog, pinjaman, nama, kode):
     # return pesan error (str) kalau gagal, atau None kalau berhasil
-    if nama not in pinjaman:
-        return f"data peminjaman tidak ditemukan"
     if nama == "":
-        return "Nama peminjam wajib diisi"
+        return "Nama peminjam wajib diisi!"
 
-    pinjaman.remove((nama, kode))
-    katalog[kode]["stok"] += 1
-    return None
+    for i, data in enumerate(pinjaman):
+        if data["nama"] == nama and data["kode"] == kode:
+            pinjaman.pop(i)
+            katalog[kode]["stok"] += 1
+            return None
+    return "Data peminjaman tidak ditemukan!"
+
 
 def rekap_per_peminjam(pinjaman):
     # return dictionary {nama: set kode buku yang sedang dipinjam}
-    if pinjaman:
-        rekap = {}
-        for nama , kode in pinjaman:
-            if nama not in rekap:
-                rekap[nama] = set()
-            rekap[nama].add(kode)
-        return rekap
+    rekap = {}
+
+    for data in pinjaman:
+        nama = data["nama"]
+        kode = data["kode"]
+
+        if nama not in rekap:
+            rekap[nama] = set()
+        rekap[nama].add(kode)
+    return rekap
+
 
 # ===== Tampilan =====
 def form_buku():
-    # lengkapi kode def form_buku() untuk input nama dan kode
-    # return (nama peminjam, kode buku, tombol Pinjam ditekan?, tombol Kembalikan ditekan?)
-    # nama dibaca APA ADANYA (case-sensitive), hanya spasi di pinggir yang dibuang
-
-    # nama = ? (TO DO)
-    # kode = ? (TO DO)
-    # kol1, kol2 = st.columns(2)
-    # pinjam = kol1.button("📖 Pinjam")
-    # kembali = kol2.button("↩️ Kembalikan")
-    # return nama, kode, pinjam, kembali
-    
     nama = st.text_input("Nama peminjam").strip()
-    kode = st.input("Kode buku").strip()
+    kode = st.selectbox("Pilih buku", options=list(KATALOG_AWAL.keys()), format_func=lambda k: f"{k} - {KATALOG_AWAL[k]['judul']}")
+
     kol1, kol2 = st.columns(2)
-    pinjam = kol1.button("📖 Pinjam")
-    kembali = kol2.button("↩️ Kembalikan")
+    pinjam = kol1.button("Pinjam")
+    kembali = kol2.button("↩️Kembalikan")
     return nama, kode, pinjam, kembali
 
 def tampilkan_katalog(katalog):
     st.table(pd.DataFrame.from_dict(katalog, orient="index"))
+
 
 def tampilkan_pinjaman(pinjaman):
     if pinjaman:
         st.table(pd.DataFrame(pinjaman))
     else:
         st.info("Belum ada buku yang sedang dipinjam.")
+
 
 def tampilkan_rekap(rekap):
     if rekap:
@@ -101,25 +102,25 @@ pinjaman = st.session_state["pinjaman"]
 
 nama, kode, pinjam, kembali = form_buku()
 
-
-# B. kerjakan di sini:
-#    - kalau `pinjam`  -> panggil pinjam_buku(...)
-#    - kalau `kembali` -> panggil kembalikan_buku(...)
-#    keduanya: kalau ada pesan -> st.error(pesan), kalau tidak -> st.success("... berhasil ...")
-
 if pinjam:
     pesan = pinjam_buku(katalog, pinjaman, nama, kode)
+
     if pesan:
         st.error(pesan)
     else:
         judul = katalog[kode]["judul"]
-        st.success
+        st.success(f"{nama} berhasil meminjam {judul} ✅")
+
 if kembali:
     pesan = kembalikan_buku(katalog, pinjaman, nama, kode)
+
     if pesan:
         st.error(pesan)
     else:
-        st.success(f"Buku '{kode}' berhasil dikembalikan oleh '{nama}'.")
+        judul = katalog[kode]["judul"]
+        st.success(f"{nama} berhasil mengembalikan {judul} ✅")
+
+
 st.subheader("📦 Stok Buku")
 tampilkan_katalog(katalog)
 
